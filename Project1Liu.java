@@ -10,19 +10,16 @@ import java.nio.file.Paths;
 
 public class Project1Liu {
   public static void main(String[] args) {
-    String input = getFileContent("src/data.txt");
-    System.out.println(input);
-    
-    String binaryData = toBinaryString(input);
-    System.out.println(binaryData);
-    
-    String[] blocks = divideDataIntoBlocks(toBinaryString(input));
-    
-    for(String block : blocks) {
-      System.out.println(block);
+    String[] blocks = inputProcessing();
+    String[] splitBlocksLeftHalf = splitBlocksIntoLeftHalves(blocks);
+    String[] splitBlocksRightHalf = splitBlocksIntoRightHalves(blocks);
+
+    for (int i = 0; i < blocks.length; i++) {
+      System.out.println(splitBlocksLeftHalf[i]);
+      System.out.println(splitBlocksRightHalf[i]);
     }
   }
-
+  
   public static String getFileContent(String pathToFile) {
     try {
 	    return new String(Files.readAllBytes(Paths.get(pathToFile)));
@@ -80,8 +77,70 @@ public class Project1Liu {
     
     return blocks;
   }
+  
+  public static String[] splitBlocksIntoLeftHalves(String[] blocks) {
+    String[] splitBlocksLeftHalf = new String[blocks.length];
+    
+    for (int i = 0; i < blocks.length; i++) {
+      String firstHalf = blocks[i].substring(0, 32);
+      splitBlocksLeftHalf[i] = firstHalf;
+    }
+    
+    return splitBlocksLeftHalf;
+  }
+  
+  public static String[] splitBlocksIntoRightHalves(String[] blocks) {
+    String[] splitBlocksRightHalf = new String[blocks.length];
+    
+    for (int i = 0; i < blocks.length; i++) {
+      String secondHalf = blocks[i].substring(32, 64);
+      splitBlocksRightHalf[i] = secondHalf;
+    }
+    return splitBlocksRightHalf;
+  }
 
-  public static void encryptBlock() {}
+  public static String[] inputProcessing() {
+    String input = getFileContent("src/data.txt");
+	  if (input != null) {
+		  return divideDataIntoBlocks(toBinaryString(input));
+	  } else {
+      return null;
+    }
+  }
 
-  public static void decryptBlock() {}
+  public static void xorIt(String binary1, String binary2) {
+  
+  }
+  
+  public static void shiftIt(String binaryInput) {
+  
+  }
+  
+  public static void permuteIt(String binaryInput) {
+  
+  }
+  
+  public static void substitutionS(String binaryInput) {
+  
+  }
+  
+  public static void functionF(String rightHalf, String subkey) {
+  
+  }
+
+  public static void encryptBlock(String block, String inputKey) {}
+
+  public static void decryptBlock(String block, String inputKey) {}
+  
+  public static void encryption(long longBinaryInput, String inputKey) {}
+  
+  public static void decryption(long longBinaryInput, String inputKey) {}
+
+  public static void keyScheduleTransform(String inputKey) {
+  
+  }
+  
+  public static void runTests() {
+  
+  }
 }
