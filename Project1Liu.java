@@ -4,9 +4,13 @@ School email: fliu24@u.rochester.edu
 Assignment: Project 1
 */
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 public class Project1Liu {
   public static void main(String[] args) {
-    String input = "";
+    String input = getFileContent("src/data.txt");
     System.out.println(input);
     
     String binaryData = toBinaryString(input);
@@ -19,6 +23,15 @@ public class Project1Liu {
     }
   }
 
+  public static String getFileContent(String pathToFile) {
+    try {
+	    return new String(Files.readAllBytes(Paths.get(pathToFile)));
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+  
   public static String toBinaryString(String input) {
     // Divide the string into an array of characters
     char[] inputCharArray = input.toCharArray();
@@ -26,7 +39,14 @@ public class Project1Liu {
 
     // Convert all the characters to binary, and add them to the binaryData string
     for (char c : inputCharArray) {
-      binaryData += Integer.toBinaryString(c);
+      String binaryString = Integer.toBinaryString(c);
+      
+      // Ensure that all characters will be converted into a binary number with 8 digits
+      while (binaryString.length() < 8) {
+        binaryString = "0" + binaryString;
+      }
+      binaryData += binaryString;
+      
     }
 
     return binaryData;
