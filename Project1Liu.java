@@ -4,7 +4,7 @@ School email: fliu24@u.rochester.edu
 Assignment: Project 1
 */
 
-public class Project1 {
+public class Project1Liu {
   public static void main(String[] args) {
     String input = "";
     System.out.println(input);
