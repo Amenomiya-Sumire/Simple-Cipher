@@ -9,43 +9,29 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Project1Liu {
-  public static void main(String[] args) {
-    String[] blocks = inputProcessing();
-    String[] splitBlocksLeftHalf = splitBlocksIntoLeftHalves(blocks);
-    String[] splitBlocksRightHalf = splitBlocksIntoRightHalves(blocks);
+  public static void main(String[] args) {}
 
-    for (int i = 0; i < blocks.length; i++) {
-      System.out.println(splitBlocksLeftHalf[i]);
-      System.out.println(splitBlocksRightHalf[i]);
-    }
-  }
-
-  public static String getFileContent(String pathToFile) {
-    try {
-      return new String(Files.readAllBytes(Paths.get(pathToFile)));
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
-    }
+  public static String getFileContent(String pathToFile) throws IOException {
+    return new String(Files.readAllBytes(Paths.get(pathToFile)));
   }
 
   public static String toBinaryString(String input) {
     // Divide the string into an array of characters
     char[] inputCharArray = input.toCharArray();
-    String binaryData = "";
+    StringBuilder binaryData = new StringBuilder();
 
     // Convert all the characters to binary, and add them to the binaryData string
     for (char c : inputCharArray) {
-      String binaryString = Integer.toBinaryString(c);
+      StringBuilder binaryString = new StringBuilder(Integer.toBinaryString(c));
 
       // Ensure that all characters will be converted into a binary number with 8 digits
       while (binaryString.length() < 8) {
-        binaryString = "0" + binaryString;
+        binaryString.insert(0, "0");
       }
-      binaryData += binaryString;
+      binaryData.append(binaryString);
     }
 
-    return binaryData;
+    return binaryData.toString();
   }
 
   public static String[] divideDataIntoBlocks(String binaryData) {
@@ -65,13 +51,13 @@ public class Project1Liu {
       int endIndex = Math.min(startIndex + blockSize, binaryData.length());
 
       // Divide data into blocks
-      String block = binaryData.substring(startIndex, endIndex);
+      StringBuilder block = new StringBuilder(binaryData.substring(startIndex, endIndex));
 
       // Ensure every block has the size of 64, adding 0 to the end if its size is smaller
       while (block.length() < blockSize) {
-        block += "0";
+        block.append("0");
       }
-      blocks[i] = block;
+      blocks[i] = block.toString();
     }
 
     return blocks;
@@ -98,35 +84,42 @@ public class Project1Liu {
     return rightHalf;
   }
 
-  public static String[] inputProcessing() {
+  public static String[] inputProcessing() throws IOException {
     String input = getFileContent("src/data.txt");
-    if (input != null) {
-      return divideDataIntoBlocks(toBinaryString(input));
-    } else {
-      return null;
-    }
+    return divideDataIntoBlocks(toBinaryString(input));
   }
 
-  public static void xorIt(String binary1, String binary2) {}
+  public static String xorIt(String binary1, String binary2) {
+    int binaryIntInput1 = Integer.parseInt(binary1, 2);
+    int binaryIntInput2 = Integer.parseInt(binary2, 2);
+    int xorResult = binaryIntInput1 ^ binaryIntInput2;
+    return Integer.toBinaryString(xorResult);
+  }
 
-  public static void shiftIt(String binaryInput) {}
+  public static String shiftIt(String binaryInput) {
+    return binaryInput.substring(1) + binaryInput.charAt(0);
+  }
 
   public static String permuteIt(String binaryInput) {
     int[] permutationTable = {
-        16, 7, 20, 21, 29, 12, 28, 17,
-        1, 15, 23, 26, 5, 18, 31, 10,
-        2, 8, 24, 14, 32, 27, 3, 9,
-        19, 13, 30, 6, 22, 11, 4, 25
+      16, 7, 20, 21, 29, 12, 28, 17,
+      1, 15, 23, 26, 5, 18, 31, 10,
+      2, 8, 24, 14, 32, 27, 3, 9,
+      19, 13, 30, 6, 22, 11, 4, 25
     };
-    
-    String permutedString = "";
-    
+
+    StringBuilder permutedString = new StringBuilder();
+
     // Add every character correspond with permutation table's position in a new string.
-    for (int i = 0; i < permutationTable.length; i++) {
-      permutedString += binaryInput.charAt(permutationTable[i] - 1);
+    for (int j : permutationTable) {
+      if (j - 1 < binaryInput.length()) {
+        permutedString.append(binaryInput.charAt(j - 1));
+      } else {
+        permutedString.append("0");
+      }
     }
-    
-    return permutedString;
+
+    return permutedString.toString();
   }
 
   public static String substitutionS(String binaryInput) {
@@ -423,11 +416,12 @@ public class Project1Liu {
         };
 
     int binaryInt = Integer.parseInt(binaryInput, 2); // Convert the binary string input into int.
-    String hexInput = Integer.toHexString(binaryInt); // Convert the binary int input into hex.
-    
+    StringBuilder hexInput =
+        new StringBuilder(Integer.toHexString(binaryInt)); // Convert the binary int input into hex.
+
     // Ensure that the hex number will be 2 digits.
     while (hexInput.length() < 2) {
-      hexInput = "0" + hexInput;
+      hexInput.insert(0, "0");
     }
 
     // Read the high and low of the hex number.
@@ -439,38 +433,42 @@ public class Project1Liu {
   }
 
   public static String[] functionF(String[] rightHalf, String subkey) {
-    String[] binarySegments = new String[rightHalf.length * 4];
+    String[] XORedString = new String[rightHalf.length];
+
+    for (int i = 0; i < rightHalf.length; i++) {
+      XORedString[i] =
+          Integer.toBinaryString(Integer.parseInt(rightHalf[i], 2) ^ Integer.parseInt(subkey, 2));
+    }
+
+    String[] binarySegments = new String[XORedString.length * 4];
 
     // Divide the 32-bit blocks into segments of 8 bits.
-    for (int i = 0; i < rightHalf.length; i++) {
+    for (int i = 0; i < XORedString.length; i++) {
       for (int j = 0; j < 4; j++) {
-        binarySegments[4 * i + j] = rightHalf[i].substring(j * 8, (j + 1) * 8);
+        binarySegments[4 * i + j] = XORedString[i].substring(j * 8, (j + 1) * 8);
       }
     }
-    
-    String[] dataAfterSubstitution = new String[rightHalf.length];
+
+    String[] dataAfterSubstitution = new String[XORedString.length];
 
     // Doing S-box substitution and concatenate the String back to 32 bits.
     for (int i = 0; i < binarySegments.length; i++) {
       String concatenatedString = substitutionS(binarySegments[i]);
-      
+
       // Ensuring that the index will not out of bound
-      if (i + 1 < binarySegments.length)
-        concatenatedString += substitutionS(binarySegments[i + 1]);
-      if (i + 2 < binarySegments.length)
-        concatenatedString += substitutionS(binarySegments[i + 2]);
-      if (i + 3 < binarySegments.length)
-        concatenatedString += substitutionS(binarySegments[i + 3]);
-      
+      if (i + 1 < binarySegments.length) concatenatedString += substitutionS(binarySegments[i + 1]);
+      if (i + 2 < binarySegments.length) concatenatedString += substitutionS(binarySegments[i + 2]);
+      if (i + 3 < binarySegments.length) concatenatedString += substitutionS(binarySegments[i + 3]);
+
       dataAfterSubstitution[i / 4] = concatenatedString;
     }
-    
+
     String[] dataAfterPermutation = new String[rightHalf.length];
-    
+
     for (int i = 0; i < dataAfterSubstitution.length; i++) {
       dataAfterPermutation[i] = permuteIt(dataAfterSubstitution[i]);
     }
-    
+
     return dataAfterPermutation;
   }
 
@@ -482,7 +480,21 @@ public class Project1Liu {
 
   public static void decryption(long longBinaryInput, String inputKey) {}
 
-  public static void keyScheduleTransform(String inputKey) {}
+  public static String[] keyScheduleTransform(String inputKey) {
+    String C = inputKey.substring(0, 28);
+    String D = inputKey.substring(28, 56);
+    String[] roundKeys = new String[10];
+
+    for (int i = 0; i < roundKeys.length; i++) {
+      C = shiftIt(C);
+      D = shiftIt(D);
+
+      String ki = C + D;
+      roundKeys[i] = ki.substring(0, 32);
+    }
+
+    return roundKeys;
+  }
 
   public static void runTests() {}
 }
