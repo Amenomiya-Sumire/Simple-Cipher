@@ -7,9 +7,13 @@ Assignment: Project 1
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class Project1Liu {
-  public static void main(String[] args) {}
+  public static void main(String[] args) {
+    runTests();
+  }
 
   public static String getFileContent(String pathToFile) throws IOException {
     return new String(Files.readAllBytes(Paths.get(pathToFile)));
@@ -63,37 +67,34 @@ public class Project1Liu {
     return blocks;
   }
 
-  public static String[] splitBlocksIntoLeftHalves(String[] blocks) {
-    String[] leftHalf = new String[blocks.length];
-
-    for (int i = 0; i < blocks.length; i++) {
-      String firstHalf = blocks[i].substring(0, 32);
-      leftHalf[i] = firstHalf;
-    }
-
-    return leftHalf;
-  }
-
-  public static String[] splitBlocksIntoRightHalves(String[] blocks) {
-    String[] rightHalf = new String[blocks.length];
-
-    for (int i = 0; i < blocks.length; i++) {
-      String secondHalf = blocks[i].substring(32, 64);
-      rightHalf[i] = secondHalf;
-    }
-    return rightHalf;
-  }
-
   public static String[] inputProcessing() throws IOException {
     String input = getFileContent("src/data.txt");
     return divideDataIntoBlocks(toBinaryString(input));
   }
 
   public static String xorIt(String binary1, String binary2) {
-    int binaryIntInput1 = Integer.parseInt(binary1, 2);
-    int binaryIntInput2 = Integer.parseInt(binary2, 2);
-    int xorResult = binaryIntInput1 ^ binaryIntInput2;
-    return Integer.toBinaryString(xorResult);
+    StringBuilder result = new StringBuilder();
+    // 手动补齐二进制字符串至相同长度
+    int maxLength = Math.max(binary1.length(), binary2.length());
+	  StringBuilder binary1Builder = new StringBuilder(binary1);
+	  while (binary1Builder.length() < maxLength) {
+      binary1Builder.insert(0, "0");
+    }
+	  binary1 = binary1Builder.toString();
+	  StringBuilder binary2Builder = new StringBuilder(binary2);
+	  while (binary2Builder.length() < maxLength) {
+      binary2Builder.insert(0, "0");
+    }
+	  binary2 = binary2Builder.toString();
+	  
+	  // 逐位比较并执行XOR操作
+    for (int i = 0; i < maxLength; i++) {
+      char bit1 = binary1.charAt(i);
+      char bit2 = binary2.charAt(i);
+      // 如果位相同，结果位为0，否则为1
+      result.append((bit1 == bit2) ? '0' : '1');
+    }
+    return result.toString();
   }
 
   public static String shiftIt(String binaryInput) {
@@ -414,71 +415,83 @@ public class Project1Liu {
             "00010110"
           }
         };
-
-    int binaryInt = Integer.parseInt(binaryInput, 2); // Convert the binary string input into int.
-    StringBuilder hexInput =
-        new StringBuilder(Integer.toHexString(binaryInt)); // Convert the binary int input into hex.
-
-    // Ensure that the hex number will be 2 digits.
-    while (hexInput.length() < 2) {
-      hexInput.insert(0, "0");
-    }
-
-    // Read the high and low of the hex number.
-    int high = Integer.parseInt(hexInput.substring(0, 1), 16);
-    int low = Integer.parseInt(hexInput.substring(1, 2), 16);
+    
+    int row = Integer.parseInt(binaryInput.substring(0, 4), 2); // 高4位确定行
+    int column = Integer.parseInt(binaryInput.substring(4), 2); // 低4位确定列
 
     // Correspond the numbers with the position of S-box.
-    return S[high][low];
+    return S[row][column];
   }
 
-  public static String[] functionF(String[] rightHalf, String subkey) {
-    String[] XORedString = new String[rightHalf.length];
-
-    for (int i = 0; i < rightHalf.length; i++) {
-      XORedString[i] =
-          Integer.toBinaryString(Integer.parseInt(rightHalf[i], 2) ^ Integer.parseInt(subkey, 2));
+  public static String functionF(String rightHalf, String subkey) {
+    StringBuilder XORedString =
+		    new StringBuilder(Long.toBinaryString(Long.parseLong(rightHalf, 2) ^ Long.parseLong(subkey, 2)));
+    
+    while (XORedString.length() < 32) {
+      XORedString.insert(0, "0");
     }
 
-    String[] binarySegments = new String[XORedString.length * 4];
+    String[] binarySegments = new String[4];
 
     // Divide the 32-bit blocks into segments of 8 bits.
-    for (int i = 0; i < XORedString.length; i++) {
-      for (int j = 0; j < 4; j++) {
-        binarySegments[4 * i + j] = XORedString[i].substring(j * 8, (j + 1) * 8);
-      }
+    for (int i = 0; i < binarySegments.length; i++) {
+      binarySegments[i] = XORedString.substring(i * 8, (i + 1) * 8);
     }
-
-    String[] dataAfterSubstitution = new String[XORedString.length];
+    
+    StringBuilder dataAfterSubstitution = new StringBuilder();
 
     // Doing S-box substitution and concatenate the String back to 32 bits.
-    for (int i = 0; i < binarySegments.length; i++) {
-      String concatenatedString = substitutionS(binarySegments[i]);
-
-      // Ensuring that the index will not out of bound
-      if (i + 1 < binarySegments.length) concatenatedString += substitutionS(binarySegments[i + 1]);
-      if (i + 2 < binarySegments.length) concatenatedString += substitutionS(binarySegments[i + 2]);
-      if (i + 3 < binarySegments.length) concatenatedString += substitutionS(binarySegments[i + 3]);
-
-      dataAfterSubstitution[i / 4] = concatenatedString;
+    for (String segment : binarySegments) {
+      dataAfterSubstitution.append(substitutionS(segment));
     }
 
-    String[] dataAfterPermutation = new String[rightHalf.length];
-
-    for (int i = 0; i < dataAfterSubstitution.length; i++) {
-      dataAfterPermutation[i] = permuteIt(dataAfterSubstitution[i]);
-    }
-
-    return dataAfterPermutation;
+    return permuteIt(String.valueOf(dataAfterSubstitution));
   }
 
-  public static void encryptBlock(String block, String inputKey) {}
+  public static String encryptBlock(String block, String inputKey) {
+    String[] roundKeys = keyScheduleTransform(inputKey);
 
-  public static void decryptBlock(String block, String inputKey) {}
+    String left = block.substring(0, block.length() / 2);
+    String right = block.substring(block.length() / 2);
 
-  public static void encryption(long longBinaryInput, String inputKey) {}
+    for (String roundKey : roundKeys) {
+      String result = functionF(right, roundKey);
+      result = xorIt(left, result);
+      left = right;
+      right = result;
+    }
 
-  public static void decryption(long longBinaryInput, String inputKey) {}
+    return left + right;
+  }
+
+  public static String decryptBlock(String block, String inputKey) {
+    String[] roundKeys = keyScheduleTransform(inputKey);
+    Collections.reverse(Arrays.asList(roundKeys));
+    
+    String left = block.substring(0, block.length() / 2);
+    String right = block.substring(block.length() / 2);
+    
+    for (String roundKey : roundKeys) {
+      String result = functionF(right, roundKey);
+      result = xorIt(left, result);
+      left = right;
+      right = result;
+    }
+    
+    return left + right;
+  }
+
+  public static String encryption(String[] longBinaryInput, String inputKey) throws IOException {
+    String[] rawBlocks = inputProcessing();
+    String[] encryptedBlocks = new String[rawBlocks.length];
+    for (int i = 0; i < encryptedBlocks.length; i++) {
+      encryptedBlocks[i] = encryptBlock(rawBlocks[i], inputKey);
+    }
+
+    return Arrays.toString(encryptedBlocks);
+  }
+
+  public static void decryption(String[] longBinaryInput, String inputKey) {}
 
   public static String[] keyScheduleTransform(String inputKey) {
     String C = inputKey.substring(0, 28);
@@ -496,5 +509,19 @@ public class Project1Liu {
     return roundKeys;
   }
 
-  public static void runTests() {}
+  public static void runTests() {
+    System.out.println("Output for: encryption(all ones, all ones)");
+    System.out.println(encryptBlock("1111111111111111111111111111111111111111111111111111111111111111", "1111111111111111111111111111111111111111111111111111111111111111"));
+    
+    System.out.println("\nOutput for: encryption(all zeros, all ones)");
+    System.out.println(encryptBlock("0000000000000000000000000000000000000000000000000000000000000000", "1111111111111111111111111111111111111111111111111111111111111111"));
+    
+    System.out.println("\nOutput for: encryption(all zeros, all zeros)");
+    System.out.println(encryptBlock("0000000000000000000000000000000000000000000000000000000000000000", "0000000000000000000000000000000000000000000000000000000000000000"));
+    
+    System.out.println("\nOutput for: encryption(block,all zeros), where:");
+    String block = "1100110010000000000001110101111100010001100101111010001001001100";
+    System.out.println("block = " + block);
+    System.out.println(encryptBlock(block, "0000000000000000000000000000000000000000000000000000000000000000"));
+  }
 }
