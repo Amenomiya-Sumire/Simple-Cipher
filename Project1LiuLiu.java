@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class Project1Liu {
+public class Project1LiuLiu {
   public static void main(String[] args) {
     runTests();
   }
