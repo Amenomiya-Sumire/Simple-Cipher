@@ -167,12 +167,12 @@ public class Project1LiuLiu {
   public static String[] keyScheduleTransform(String inputKey) {
     String C = inputKey.substring(0, 28);
     String D = inputKey.substring(28, 56);
+    //store the generated subkeys
     String[] roundKeys = new String[10];
 
     for (int i = 0; i < roundKeys.length; i++) {
       C = shiftIt(C);
       D = shiftIt(D);
-
       String ki = C + D;
       roundKeys[i] = ki.substring(0, 32);
     }
@@ -181,10 +181,11 @@ public class Project1LiuLiu {
   }
 
   public static String functionF(String rightHalf, String subkey) {
+    //convert to long and go through XOR operation
     StringBuilder XORedString =
         new StringBuilder(
             Long.toBinaryString(Long.parseLong(rightHalf, 2) ^ Long.parseLong(subkey, 2)));
-
+    //make sure its length is 32
     while (XORedString.length() < 32) {
       XORedString.insert(0, "0");
     }
@@ -207,6 +208,7 @@ public class Project1LiuLiu {
   }
 
   public static String substitutionS(String binaryInput) {
+    //input S-Box lookup
     String[][] S =
         new String[][] {
           {
@@ -498,15 +500,16 @@ public class Project1LiuLiu {
             "00010110"
           }
         };
-
-    int row = Integer.parseInt(binaryInput.substring(0, 4), 2); // 高4位确定行
-    int column = Integer.parseInt(binaryInput.substring(4), 2); // 低4位确定列
-
+    //first 4 bits determine row, last 4 bits determine column
+    int row = Integer.parseInt(binaryInput.substring(0, 4), 2); 
+    int column = Integer.parseInt(binaryInput.substring(4), 2); 
+    
     // Correspond the numbers with the position of S-box.
     return S[row][column];
   }
 
   public static String permuteIt(String binaryInput) {
+    //input the permutation table
     int[] permutationTable = {
       16, 7, 20, 21, 29, 12, 28, 17,
       1, 15, 23, 26, 5, 18, 31, 10,
@@ -530,7 +533,7 @@ public class Project1LiuLiu {
 
   public static String xorIt(String binary1, String binary2) {
     StringBuilder result = new StringBuilder();
-    // 手动补齐二进制字符串至相同长度
+    // make the length of two string be the same
     int maxLength = Math.max(binary1.length(), binary2.length());
     StringBuilder binary1Builder = new StringBuilder(binary1);
     while (binary1Builder.length() < maxLength) {
@@ -543,11 +546,11 @@ public class Project1LiuLiu {
     }
     binary2 = binary2Builder.toString();
 
-    // 逐位比较并执行XOR操作
+    // use XOR operation on each bit
     for (int i = 0; i < maxLength; i++) {
       char bit1 = binary1.charAt(i);
       char bit2 = binary2.charAt(i);
-      // 如果位相同，结果位为0，否则为1
+      //if the same, return 0, and vise versa
       result.append((bit1 == bit2) ? '0' : '1');
     }
     return result.toString();
