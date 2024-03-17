@@ -7,6 +7,7 @@ Assignment: Project 1
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Scanner;
@@ -21,7 +22,7 @@ public class Cipher {
     if (scanner.next().equalsIgnoreCase("E")) {
       System.out.println("File name: ");
       try {
-        String fileName = "src/" + scanner.next();
+        String fileName = scanner.next();
         String longBinaryInput = getFileContent(fileName);
         System.out.println("Secret key: ");
         String inputKey = scanner.next();
@@ -47,7 +48,7 @@ public class Cipher {
     } else if (scanner.next().equalsIgnoreCase("D")) {
       System.out.println("File name: ");
       try {
-        String fileName = "src/" + scanner.next();
+        String fileName = scanner.next();
         String longBinaryInput = getFileContent(fileName);
         System.out.println("Secret key: ");
         String inputKey = scanner.next();
@@ -135,6 +136,25 @@ public class Cipher {
     return new String(Files.readAllBytes(Paths.get(pathToFile)));
   }
 
+  public static String toBinaryString(String input) {
+    // Divide the string into an array of characters
+    char[] inputCharArray = input.toCharArray();
+    StringBuilder binaryData = new StringBuilder();
+
+    // Convert all the characters to binary, and add them to the binaryData string
+    for (char c : inputCharArray) {
+      StringBuilder binaryString = new StringBuilder(Integer.toBinaryString(c));
+
+      // Ensure that all characters will be converted into a binary number with 8 digits
+      while (binaryString.length() < 8) {
+        binaryString.insert(0, "0");
+      }
+      binaryData.append(binaryString);
+    }
+
+    return binaryData.toString();
+  }
+
   public static String[] divideDataIntoBlocks(String binaryData) {
     int blockSize = 64;
 
@@ -167,7 +187,7 @@ public class Cipher {
   public static String[] keyScheduleTransform(String inputKey) {
     String C = inputKey.substring(0, 28);
     String D = inputKey.substring(28, 56);
-    //store the generated subkeys
+    // store the generated subkeys
     String[] roundKeys = new String[10];
 
     for (int i = 0; i < roundKeys.length; i++) {
@@ -181,11 +201,11 @@ public class Cipher {
   }
 
   public static String functionF(String rightHalf, String subkey) {
-    //convert to long and go through XOR operation
+    // convert to long and go through XOR operation
     StringBuilder XORedString =
         new StringBuilder(
             Long.toBinaryString(Long.parseLong(rightHalf, 2) ^ Long.parseLong(subkey, 2)));
-    //make sure its length is 32
+    // make sure its length is 32
     while (XORedString.length() < 32) {
       XORedString.insert(0, "0");
     }
@@ -208,7 +228,7 @@ public class Cipher {
   }
 
   public static String substitutionS(String binaryInput) {
-    //input S-Box lookup
+    // input S-Box lookup
     String[][] S =
         new String[][] {
           {
@@ -500,16 +520,17 @@ public class Cipher {
             "00010110"
           }
         };
-    //first 4 bits determine row, last 4 bits determine column
-    int row = Integer.parseInt(binaryInput.substring(0, 4), 2); 
-    int column = Integer.parseInt(binaryInput.substring(4), 2); 
-    
+
+    // first 4 bits determine row, last 4 bits determine column
+    int row = Integer.parseInt(binaryInput.substring(0, 4), 2);
+    int column = Integer.parseInt(binaryInput.substring(4), 2);
+
     // Correspond the numbers with the position of S-box.
     return S[row][column];
   }
 
   public static String permuteIt(String binaryInput) {
-    //input the permutation table
+    // input the permutation table
     int[] permutationTable = {
       16, 7, 20, 21, 29, 12, 28, 17,
       1, 15, 23, 26, 5, 18, 31, 10,
@@ -533,7 +554,7 @@ public class Cipher {
 
   public static String xorIt(String binary1, String binary2) {
     StringBuilder result = new StringBuilder();
-    // make the length of two string be the same
+    // Ensures the length of two strings are the same
     int maxLength = Math.max(binary1.length(), binary2.length());
     StringBuilder binary1Builder = new StringBuilder(binary1);
     while (binary1Builder.length() < maxLength) {
@@ -550,7 +571,7 @@ public class Cipher {
     for (int i = 0; i < maxLength; i++) {
       char bit1 = binary1.charAt(i);
       char bit2 = binary2.charAt(i);
-      //if the same, return 0, and vise versa
+      // if the same, return 0, and vise versa
       result.append((bit1 == bit2) ? '0' : '1');
     }
     return result.toString();
@@ -594,7 +615,8 @@ public class Cipher {
   }
 
   public static String encryption(String longBinaryInput, String inputKey) {
-    String[] processedInput = divideDataIntoBlocks(longBinaryInput);
+    String binaryString = toBinaryString(longBinaryInput);
+    String[] processedInput = divideDataIntoBlocks(binaryString);
     StringBuilder encryptedMessage = new StringBuilder();
     for (String s : processedInput) {
       encryptedMessage.append(encryptBlock(s, inputKey));
@@ -611,6 +633,8 @@ public class Cipher {
       decryptedMessage.append(decryptBlock(s, inputKey));
     }
 
-    return decryptedMessage.toString();
+    String binaryDecryptedMessage = decryptedMessage.toString();
+
+    return new String(new BigInteger(binaryDecryptedMessage, 2).toByteArray());
   }
 }
