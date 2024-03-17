@@ -11,7 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
-public class Project1LiuLiu {
+public class Cipher {
   public static void main(String[] args) {
     runTests();
 
