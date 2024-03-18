@@ -1,6 +1,6 @@
 /*
 Name: Fengkai Liu, Yu Liu
-School email: fliu24@u.rochester.edu, yliu30
+School email: fliu24@u.rochester.edu, yliu307@u.rochester.edu
 Assignment: Project 1
 */
 
