@@ -4,9 +4,30 @@ Yu Liu
 CS Project1
 ```
 
-In this project, we write a code used to encrypt and decrypt data. For encryption and decryption, we convert plain binary data into an encrypted form using a secret key and then convert it back. We use file Handling to read binary data from and write encrypted/decrypted binary data to files. The set of operations including permutation, substitution (S-box), XOR operations, and key schedule transformations are all crucial to the encryption and decryption process. The program also includes a series of test cases to demonstrate the functionality when dealing with different types of binary data and keys.
+## Program Introduction
 
-Through the process, Fengkai Liu mainly handles the encryption side, while Yu Liu handles the decryption side. Fengkai Liu also writes the methods: xorIt(binary1, binary2), permuteIt(binaryInput), functionF(rightHalf, subkey), and keyScheduleTransform(inputKey). Yu Liu write the methods: shiftIt(binaryInput), SubstitutionS(binaryInput), and runTests(). We work together with debugging, and it costs a total of about 5 days to complete the entire project.
+This Java program is designed to encrypt and decrypt files using a simple ECB (Electronic Codebook) mode. In this program, the user can encrypt and decrypt .txt files that includes either binary string data and text data with a 56 bit secret key. 
+
+It includes the following methods:
+- **main(String[] args)**: Controls the program's flow, including user input for operation selection, file paths, and key input.
+- **runTests()**: Demonstrates the program's encryption and decryption capabilities through preset test cases.
+- **getFileContent(String pathToFile)**: Reads and returns the content of a specified file as a string.
+- **toBinaryString(String input)**: Converts text input into a binary string representation.
+- **divideDataIntoBlocks(String binaryData)**: Splits a binary string into 64-bit blocks for processing.
+- **keyScheduleTransform(String inputKey)**: Generates a series of sub-keys from a 56-bit key for use in encryption or decryption rounds.
+- **functionF(String rightHalf, String subkey)**: Applies a series of transformations using a sub-key.
+- **substitutionS(String binaryInput)**: Performs substitution on a binary input using an S-box.
+- **permuteIt(String binaryInput)**: Applies a permutation to a binary input based on a predefined table.
+- **xorIt(String binary1, String binary2)**: Performs bitwise XOR operation on two binary strings.
+- **shiftIt(String binaryInput)**: Left-shifts a binary input by one bit.
+- **encryptBlock(String block, String inputKey)**: Encrypts a 64-bit block using the generated sub-keys.
+- **decryptBlock(String block, String inputKey)**: Decrypts a 64-bit block using the generated sub-keys.
+- **encryption(String longBinaryInput, String inputKey)**: Encrypts a long binary input by processing each block with encryptBlock.
+- **decryption(String longBinaryInput, String inputKey)**: Decrypts a long binary input by processing each block with decryptBlock.
+
+Fengkai Liu wrote the methods: main, encryption, encryptBlock, xorIt, permuteIt, functionF, and keyScheduleTransform. 
+Yu Liu wrote the methods: decryption, decryptBlock, shiftIt, SubstitutionS, and runTests. 
+We work together with debugging, and it costs a total of about 5 days to complete the entire project.
 
 ## Special Features:
 ### StringBuilder instead of normal String operation
@@ -19,8 +40,7 @@ The main methods of string builder that we use are:
 
 (The method descriptions are from https://www.geeksforgeeks.org/stringbuilder-class-in-java-with-examples/)
 
-Additional note:
-(1) String.valueOf() method converts different types of values into string.
+Additional note: String.valueOf() method converts different types of values into string.
 
 (The method description is from https://www.javatpoint.com/java-string-valueof)
 
