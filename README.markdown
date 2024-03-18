@@ -1,6 +1,8 @@
+```
 Fengkai Liu
 Yu Liu
 CS Project1
+```
 
 In this project, we write a code used to encrypt and decrypt data. For encryption and decryption, we convert plain binary data into an encrypted form using a secret key and then convert it back. We use file Handling to read binary data from and write encrypted/decrypted binary data to files. The set of operations including permutation, substitution (S-box), XOR operations, and key schedule transformations are all crucial to the encryption and decryption process. The program also includes a series of test cases to demonstrate the functionality when dealing with different types of binary data and keys.
 
