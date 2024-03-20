@@ -1,9 +1,3 @@
-```
-Fengkai Liu
-Yu Liu
-CS Project1
-```
-
 ## Program Introduction
 
 This Java program is designed to encrypt and decrypt files using a simple ECB (Electronic Codebook) mode. In this program, the user can encrypt and decrypt .txt files that includes either binary string data and text data with a 56 bit secret key. 
