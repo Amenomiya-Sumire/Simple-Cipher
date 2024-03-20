@@ -1,9 +1,3 @@
-/*
-Name: Fengkai Liu, Yu Liu
-School email: fliu24@u.rochester.edu, yliu307@u.rochester.edu
-Assignment: Project 1
-*/
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
